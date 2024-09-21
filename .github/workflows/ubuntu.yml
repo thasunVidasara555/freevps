@@ -1,23 +1,20 @@
-name: SSH Server
+name: SSH Access to Runner
 
 on:
   workflow_dispatch:
 
 jobs:
-
   ssh:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-      
-    - name: Start SSH server
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y openssh-server
-        sudo mkdir -p /run/sshd
-        echo "root:${{ secrets.ROOT_PASSWORD }}" | sudo chpasswd
-        sudo sed -i 's/#*PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-        sudo systemctl start sshd
-        sudo systemctl status sshd
+
+    - name: Setup Upterm session
+      uses: lhotari/action-upterm@v1
+      with:
+        limit-access-to-actor: true  # Optional, restricts access to only you
+
+    - name: Wait for session
+      run: sleep 3600  # Keeps the job running for an hour; adjust as needed
