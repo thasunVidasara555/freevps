@@ -16,7 +16,8 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y openssh-server
-        sudo mkdir /run/sshd
+        sudo mkdir -p /run/sshd
         echo "root:${{ secrets.ROOT_PASSWORD }}" | sudo chpasswd
+        sudo sed -i 's/#*PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
         sudo systemctl start sshd
         sudo systemctl status sshd
