@@ -1,32 +1,22 @@
-name: SSH into Runner
+name: Temporary SSH-like Access
 
 on:
   workflow_dispatch:
 
 jobs:
-
-  ssh:
+  provide-ssh-access:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      with:
+        limit-access-to-actor: true
       
-    - name: Setup SSH
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+    - name: Keep alive
       run: |
-        echo "$SSH_PRIVATE_KEY" > private_key.pem
-        chmod 600 private_key.pem
-        
-    - name: SSH into Runner
-      run: |
-        ssh -o StrictHostKeyChecking=no -i private_key.pem user@your-server.com <<EOF
-          # Commands to run on the runner
-          whoami
-          pwd
-        EOF
-        
-    - name: Clean up
-      if: always()
-      run: rm -f private_key.pem
+        echo "SSH-like session is active for 30 minutes."
+        echo "You can install software and work in this environment."
+        echo "Remember, this environment is temporary and will be destroyed after the workflow ends."
+        sleep 1800  # 30 minutes
