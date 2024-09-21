@@ -1,1 +1,22 @@
-name: SSH Serveron:  workflow_dispatch:jobs:  ssh:    runs-on: ubuntu-latest        steps:    - name: Checkout code      uses: actions/checkout@v2          - name: Start SSH server      run: |        sudo apt-get update        sudo apt-get install -y openssh-server        sudo mkdir /run/sshd        echo "root:${{ secrets.ROOT_PASSWORD }}" | sudo chpasswd        sudo systemctl start sshd        sudo systemctl status sshd
+name: SSH Server
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  ssh:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+      
+    - name: Start SSH server
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openssh-server
+        sudo mkdir /run/sshd
+        echo "root:${{ secrets.ROOT_PASSWORD }}" | sudo chpasswd
+        sudo systemctl start sshd
+        sudo systemctl status sshd
