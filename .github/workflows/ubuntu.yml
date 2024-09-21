@@ -1,20 +1,32 @@
-name: SSH Access to Runner
+name: SSH into Runner
 
 on:
   workflow_dispatch:
 
 jobs:
+
   ssh:
     runs-on: ubuntu-latest
-
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-
-    - name: Setup Upterm session
-      uses: lhotari/action-upterm@v1
-      with:
-        limit-access-to-actor: true  # Optional, restricts access to only you
-
-    - name: Wait for session
-      run: sleep 3600  # Keeps the job running for an hour; adjust as needed
+      
+    - name: Setup SSH
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      run: |
+        echo "$SSH_PRIVATE_KEY" > private_key.pem
+        chmod 600 private_key.pem
+        
+    - name: SSH into Runner
+      run: |
+        ssh -o StrictHostKeyChecking=no -i private_key.pem user@your-server.com <<EOF
+          # Commands to run on the runner
+          whoami
+          pwd
+        EOF
+        
+    - name: Clean up
+      if: always()
+      run: rm -f private_key.pem
