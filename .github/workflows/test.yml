@@ -1,18 +1,12 @@
-
 name: RustDesk Setup
 
 on:
   workflow_dispatch:
-    inputs:
-      timeout-minutes:
-        description: 'Timeout in minutes'
-        required: true
-        default: '30'
 
 jobs:
   setup-rustdesk:
     runs-on: ubuntu-latest
-    timeout-minutes: ${{ github.event.inputs.timeout-minutes }}
+    timeout-minutes: 30
     
     steps:
     - name: Install RustDesk
@@ -33,5 +27,5 @@ jobs:
     - name: Keep alive
       run: |
         echo "RustDesk is running. Use the ID and password to connect."
-        echo "This step will timeout after ${{ github.event.inputs.timeout-minutes }} minutes."
-        sleep $((60 * ${{ github.event.inputs.timeout-minutes }}))
+        echo "This step will timeout after 30 minutes."
+        sleep 1800
