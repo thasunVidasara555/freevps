@@ -1,34 +1,41 @@
-name: RustDesk Setup
+name: VNC Setup for GUI Access
 
 on:
   workflow_dispatch:
 
 jobs:
-  setup-rustdesk:
+  setup-vnc:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    
     steps:
-    - name: Install Dependencies
+    - name: Install VNC and XFCE
       run: |
         sudo apt-get update
-        sudo apt-get install -y wget libxdo3 libxcb-shape0 libva-drm2 libva-x11-2 libvdpau1 libgstreamer-plugins-base1.0-0 libappindicator3-1 gstreamer1.0-pipewire
-
-    - name: Install RustDesk
-      run: |
-        wget https://github.com/rustdesk/rustdesk/releases/download/1.2.3/rustdesk-1.2.3-x86_64.deb
-        sudo dpkg -i rustdesk-1.2.3-x86_64.deb
-        sudo apt-get install -f
-
-    - name: Run RustDesk
-      run: |
-        rustdesk --get-id > rustdesk_id.txt
-        echo "RustDesk ID:" $(cat rustdesk_id.txt)
-        rustdesk --password mypassword123 &
-        echo "RustDesk password: mypassword123"
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install -y xfce4 xfce4-goodies tightvncserver
         
-    - name: Keep alive
+    - name: Configure VNC
       run: |
-        echo "RustDesk is running. Use the ID and password to connect."
-        echo "This step will timeout after 30 minutes."
-        sleep 1800
+        mkdir -p ~/.vnc
+        echo "password" | vncpasswd -f > ~/.vnc/passwd
+        chmod 600 ~/.vnc/passwd
+        echo '#!/bin/bash' > ~/.vnc/xstartup
+        echo 'xrdb $HOME/.Xresources' >> ~/.vnc/xstartup
+        echo 'startxfce4 &' >> ~/.vnc/xstartup
+        chmod +x ~/.vnc/xstartup
+        
+    - name: Start VNC Server
+      run: |
+        vncserver :1 -geometry 1280x800 -depth 24
+        echo "VNC server started on display :1"
+        
+    - name: Setup SSH Tunnel
+      run: |
+        echo "To access the VNC server, set up an SSH tunnel with:"
+        echo "ssh -L 5901:localhost:5901 -p [SSH_PORT] [SSH_USER]@[SSH_HOST]"
+        echo "Then connect your VNC client to localhost:5901"
+        echo "VNC Password: password"
+        
+    - name: Keep Alive
+      run: |
+        echo "VNC server is running. You can now connect using an SSH tunnel and VNC client."
+        echo "This step will timeout after 60 minutes."
+        sleep 3600
