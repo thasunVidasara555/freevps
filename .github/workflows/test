@@ -1,1 +1,37 @@
 
+name: RustDesk Setup
+
+on:
+  workflow_dispatch:
+    inputs:
+      timeout-minutes:
+        description: 'Timeout in minutes'
+        required: true
+        default: '30'
+
+jobs:
+  setup-rustdesk:
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ github.event.inputs.timeout-minutes }}
+    
+    steps:
+    - name: Install RustDesk
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y wget
+        wget https://github.com/rustdesk/rustdesk/releases/download/1.2.3/rustdesk-1.2.3-x86_64.deb
+        sudo dpkg -i rustdesk-1.2.3-x86_64.deb
+        sudo apt-get install -f
+
+    - name: Run RustDesk
+      run: |
+        rustdesk --get-id > rustdesk_id.txt
+        echo "RustDesk ID:" $(cat rustdesk_id.txt)
+        rustdesk --password mypassword123 &
+        echo "RustDesk password: mypassword123"
+        
+    - name: Keep alive
+      run: |
+        echo "RustDesk is running. Use the ID and password to connect."
+        echo "This step will timeout after ${{ github.event.inputs.timeout-minutes }} minutes."
+        sleep $((60 * ${{ github.event.inputs.timeout-minutes }}))
