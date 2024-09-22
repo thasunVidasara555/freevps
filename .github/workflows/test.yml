@@ -9,10 +9,13 @@ jobs:
     timeout-minutes: 30
     
     steps:
-    - name: Install RustDesk
+    - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y wget
+        sudo apt-get install -y wget libxdo3 libxcb-shape0 libva-drm2 libva-x11-2 libvdpau1 libgstreamer-plugins-base1.0-0 libappindicator3-1 gstreamer1.0-pipewire
+
+    - name: Install RustDesk
+      run: |
         wget https://github.com/rustdesk/rustdesk/releases/download/1.2.3/rustdesk-1.2.3-x86_64.deb
         sudo dpkg -i rustdesk-1.2.3-x86_64.deb
         sudo apt-get install -f
