@@ -1,0 +1,25 @@
+name: Get Fastest Pacman Mirrors
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup-reflector:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Set up Docker
+      run: |
+        docker pull archlinux:latest
+        docker run --name arch-container -d archlinux:latest sleep infinity
+
+    - name: Install reflector and pacman
+      run: |
+        docker exec arch-container bash -c "
+          pacman -Syu --noconfirm && \
+          pacman -S --needed --noconfirm reflector && \
+          reflector --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
+        "
+
+    - name: Output fastest mirrors
+      run: |
+        docker exec arch-container bash -c "cat /etc/pacman.d/mirrorlist"
