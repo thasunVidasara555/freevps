@@ -1,4 +1,4 @@
-name: Install UltimMC and Forward Interface
+name: Install and Run UltimMC
 
 on:
   workflow_dispatch:
@@ -10,17 +10,21 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y openjdk-17-jdk wget unzip
+        sudo apt-get install -y unzip wget curl
 
     - name: Download UltimMC
       run: |
-        wget https://github.com/UltimMC/Launcher/releases/latest/download/UltimMC.deb
-        sudo dpkg -i UltimMC.deb || sudo apt-get install -f
+        wget https://nightly.link/UltimMC/Launcher/workflows/main/develop/mmc-cracked-lin64.zip
+        unzip mmc-cracked-lin64.zip
+        cd mmc-cracked-lin64
+
+    - name: Give Execute Permissions
+      run: |
+        chmod +x UltimMC  # Adjust this if the executable has a different name
 
     - name: Start UltimMC
       run: |
-        # Start UltimMC in the background (adjust the command as necessary)
-        ultim-mc &  # Replace with the actual command to start UltimMC
+        ./UltimMC &  # Start UltimMC in the background
 
     - name: Set up ngrok for public access
       run: |
