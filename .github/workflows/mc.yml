@@ -1,4 +1,4 @@
-name: Install UltimMC and Minecraft
+name: Install UltimMC and Forward Interface
 
 on:
   workflow_dispatch:
@@ -7,9 +7,6 @@ jobs:
   setup-ultimmc:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
-
     - name: Install Dependencies
       run: |
         sudo apt-get update
@@ -19,14 +16,6 @@ jobs:
       run: |
         wget https://github.com/UltimMC/Launcher/releases/latest/download/UltimMC.deb
         sudo dpkg -i UltimMC.deb || sudo apt-get install -f
-
-    - name: Set up Minecraft with Fabric
-      run: |
-        mkdir -p ~/.local/share/UltimMC/instances/Minecraft_1.21.1
-        cd ~/.local/share/UltimMC/instances/Minecraft_1.21.1
-        wget https://launcher.mojang.com/v1/objects/<minecraft_version_hash>/client.jar -O minecraft.jar
-        wget https://github.com/FabricMC/fabric-loader/releases/download/0.14.10/fabric-installer.jar
-        java -jar fabric-installer.jar client -n --version 1.21.1
 
     - name: Start UltimMC
       run: |
