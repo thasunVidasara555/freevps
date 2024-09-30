@@ -1,0 +1,46 @@
+name: Install UltimMC and Minecraft
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup-ultimmc:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y openjdk-17-jdk wget unzip
+
+    - name: Download UltimMC
+      run: |
+        wget https://github.com/UltimMC/Launcher/releases/latest/download/UltimMC.deb
+        sudo dpkg -i UltimMC.deb || sudo apt-get install -f
+
+    - name: Set up Minecraft with Fabric
+      run: |
+        mkdir -p ~/.local/share/UltimMC/instances/Minecraft_1.21.1
+        cd ~/.local/share/UltimMC/instances/Minecraft_1.21.1
+        wget https://launcher.mojang.com/v1/objects/<minecraft_version_hash>/client.jar -O minecraft.jar
+        wget https://github.com/FabricMC/fabric-loader/releases/download/0.14.10/fabric-installer.jar
+        java -jar fabric-installer.jar client -n --version 1.21.1
+
+    - name: Start UltimMC
+      run: |
+        # Start UltimMC in the background (adjust the command as necessary)
+        ultim-mc &  # Replace with the actual command to start UltimMC
+
+    - name: Set up ngrok for public access
+      run: |
+        wget https://bin.equinox.io/c/111111/ngrok-stable-linux-amd64.zip
+        unzip ngrok-stable-linux-amd64.zip
+        sudo mv ngrok /usr/local/bin
+        ngrok http 8080 &  # Replace 8080 with the actual port used by UltimMC
+
+    - name: Output ngrok URL
+      run: |
+        sleep 10  # Wait for ngrok to initialize
+        curl -s http://localhost:4040/api/tunnels | jq '.tunnels[0].public_url'
