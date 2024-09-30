@@ -1,4 +1,4 @@
-name: Get Fastest Pacman Mirrors
+name: Get Fastest Pacman Mirrors for US
 
 on:
   workflow_dispatch:
@@ -16,10 +16,12 @@ jobs:
       run: |
         docker exec arch-container bash -c "
           pacman -Syu --noconfirm && \
-          pacman -S --needed --noconfirm reflector && \
-          reflector --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
+          pacman -S --needed --noconfirm reflector
         "
 
-    - name: Output fastest mirrors
+    - name: Get fastest mirrors for US
       run: |
-        docker exec arch-container bash -c "cat /etc/pacman.d/mirrorlist"
+        docker exec arch-container bash -c "
+          reflector --country 'United States' --protocol http --sort rate --age 12 --save /etc/pacman.d/mirrorlist && \
+          cat /etc/pacman.d/mirrorlist
+        "
