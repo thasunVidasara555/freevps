@@ -16,15 +16,14 @@ jobs:
       run: |
         wget https://nightly.link/UltimMC/Launcher/workflows/main/develop/mmc-cracked-lin64.zip
         unzip mmc-cracked-lin64.zip
-        cd mmc-cracked-lin64
 
     - name: Give Execute Permissions
       run: |
-        chmod +x UltimMC  # Adjust this if the executable has a different name
+        chmod +x UltimMC/UltimMC  # Adjust this if the executable has a different name
 
     - name: Start UltimMC
       run: |
-        ./UltimMC &  # Start UltimMC in the background
+        ./UltimMC/UltimMC &  # Start UltimMC in the background
 
     - name: Set up ngrok for public access
       run: |
