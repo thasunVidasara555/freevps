@@ -1,26 +1,28 @@
-name: CI
+name: Cloudflare SSH Tunnel
 
 on: [push]
 
 jobs:
-  build:
-    runs-on: windows-latest
+  ssh-tunnel:
+    runs-on: ubuntu-latest
     steps:
-      - name: Download ngrok
-        run: Invoke-WebRequest -Uri https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Unzip ngrok
-        run: Expand-Archive -Path ngrok.zip -DestinationPath . -Force
-
-      - name: Connect to ngrok
-        env:
-          NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+      - name: Install Cloudflared
         run: |
-          try {
-            .\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
-            .\ngrok.exe tcp 3389
-          } catch {
-            Write-Host "Ngrok failed to start. Logging the authtoken for debugging."
-            Write-Host "Authtoken: $Env:NGROK_AUTH_TOKEN"
-            exit 1
-          }
+          wget https://bin.equinox.io/c/111111/cloudflared-linux-amd64
+          sudo mv cloudflared-linux-amd64 /usr/local/bin/cloudflared
+          sudo chmod +x /usr/local/bin/cloudflared
+
+      - name: Start SSH Server
+        run: |
+          sudo apt-get update && sudo apt-get install openssh-server -y
+          sudo service ssh start
+
+      - name: Create Cloudflare Tunnel
+        run: |
+          cloudflared tunnel --url tcp://localhost:22 &
+
+      - name: Display connection info
+        run: echo "SSH tunnel is set up. Connect using your Cloudflare tunnel."
