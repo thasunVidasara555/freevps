@@ -11,7 +11,9 @@ jobs:
 
       - name: Install Cloudflared
         run: |
-          wget https://bin.equinox.io/c/111111/cloudflared-linux-amd64
+          # Download cloudflared
+          wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+          # Move it to /usr/local/bin and make it executable
           sudo mv cloudflared-linux-amd64 /usr/local/bin/cloudflared
           sudo chmod +x /usr/local/bin/cloudflared
 
